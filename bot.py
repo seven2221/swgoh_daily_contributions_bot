@@ -1,14 +1,14 @@
-import requests
 import os
-from dotenv import load_dotenv
 import sys
 import json
+import requests
+from dotenv import load_dotenv
 
 def send_telegram_message(chat_id, message):
     telegram_url = f"https://api.telegram.org/bot{os.getenv('BOT_API_TOKEN')}/sendMessage"
     telegram_payload = {"chat_id": chat_id, "text": message}
+
     response = requests.post(telegram_url, json=telegram_payload)
-    
     if response.status_code != 200:
         print(f"Ошибка при отправке сообщения в Телеграм: {response.text}")
 
@@ -22,7 +22,7 @@ def get_players_to_notify(data, telegram_users):
         if currentValue < 600 and playerName in telegram_users:
             telegramName = telegram_users[playerName]
             players_to_notify.append(f"{playerName} ({currentValue} / 600) {telegramName}")
-    
+
     return players_to_notify
 
 def main():
@@ -47,11 +47,10 @@ def main():
     data = response.json()["guild"]["member"]
 
     players_to_notify = get_players_to_notify(data, telegram_users)
-    
     if players_to_notify:
         message = "Не все сдали энку!\nСписок тунеядцев-бездельников:\n\n" + "\n".join(players_to_notify)
     else:
-        message = "Ай молодцы, энка сдана!"
+        message = "Ну ведь можем же когда захотим!\nЭнка сдана по максимуму, все красавчики!\nАй да молодцы, ты посмотри!\n"
 
     send_telegram_message(chat_id, message)
 

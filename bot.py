@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import json
 import requests
 from dotenv import load_dotenv
@@ -25,6 +26,11 @@ def get_players_to_notify(data, telegram_users):
 
     return players_to_notify
 
+def check_response(response):
+    if "guild" in response.json():
+        return True
+    return False
+
 def main():
     load_dotenv(dotenv_path=sys.argv[1])
     
@@ -43,7 +49,13 @@ def main():
         "enums": False
     }
 
-    response = requests.post(url, json=payload)
+    response = None
+    while not response or not check_response(response):
+        response = requests.post(url, json=payload)
+        if not check_response(response):
+            print("Guild не найден в ответе. Повторный запрос через 30 секунд...")
+            time.sleep(30) 
+    
     data = response.json()["guild"]["member"]
 
     players_to_notify = get_players_to_notify(data, telegram_users)

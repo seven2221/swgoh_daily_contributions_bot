@@ -5,10 +5,12 @@ import json
 import requests
 from dotenv import load_dotenv
 
-def send_telegram_message(chat_id, message):
+def send_telegram_message(chat_id, message, thread_id=None):
     telegram_url = f"https://api.telegram.org/bot{os.getenv('BOT_API_TOKEN')}/sendMessage"
-    telegram_payload = {"chat_id": chat_id, "text": message}
-
+    if thread_id:
+        telegram_payload = {"chat_id": chat_id, "text": message, "message_thread_id": thread_id}
+    else:
+        telegram_payload = {"chat_id": chat_id, "text": message}
     response = requests.post(telegram_url, json=telegram_payload)
     if response.status_code != 200:
         print(f"Ошибка при отправке сообщения в Телеграм: {response.text}")
@@ -34,6 +36,8 @@ def check_response(response):
 def main():
     load_dotenv(dotenv_path=sys.argv[1])
     
+    if os.getenv("GUILD_ID"):
+        thread_id = os.getenv("THREAD_ID")
     guild_id = os.getenv("GUILD_ID")
     chat_id = os.getenv("CHAT_ID")
     comlink_url = os.getenv("COMLINK_URL")
@@ -64,7 +68,7 @@ def main():
     else:
         message = "Ну ведь можем же когда захотим!\nЭнка сдана по максимуму, все красавчики!\nАй да молодцы, ты посмотри!\n"
 
-    send_telegram_message(chat_id, message)
+    send_telegram_message(chat_id, message, thread_id)
 
 if __name__ == "__main__":
     main()

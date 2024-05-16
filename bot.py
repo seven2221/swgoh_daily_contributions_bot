@@ -64,9 +64,9 @@ def main():
 
     players_to_notify = get_players_to_notify(data, telegram_users)
     if players_to_notify:
-        message = "Не все сдали энку!\nСписок тунеядцев-бездельников:\n\n" + "\n".join(players_to_notify)
+        message = "Кто тянет команду вниз?\nКто положил меньше всех денег в банк?\nКто не ответил ни на один вопрос?\nКто самое слабое звено?\n\n" + "\n".join(players_to_notify)
     else:
-        message = "Ну ведь можем же когда захотим!\nЭнка сдана по максимуму, все красавчики!\nАй да молодцы, ты посмотри!\n"
+        message = "Нихуя себе дождались.\nВсе энку сдали...\n"
 
     send_telegram_message(chat_id, message, thread_id)
 

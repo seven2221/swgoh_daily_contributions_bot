@@ -7,11 +7,14 @@ from dotenv import load_dotenv
 
 def send_telegram_message(chat_id, message, thread_id=None):
     telegram_url = f"https://api.telegram.org/bot{os.getenv('BOT_API_TOKEN')}/sendMessage"
+    
     if thread_id:
         telegram_payload = {"chat_id": chat_id, "text": message, "message_thread_id": thread_id}
     else:
         telegram_payload = {"chat_id": chat_id, "text": message}
+    
     response = requests.post(telegram_url, json=telegram_payload)
+    
     if response.status_code != 200:
         print(f"Ошибка при отправке сообщения в Телеграм: {response.text}")
 
@@ -20,10 +23,10 @@ def get_players_to_notify(data, telegram_users):
     
     for member in data:
         playerName = member["playerName"]
+        print(member["playerName"])
         currentValue = int([x["currentValue"] for x in member["memberContribution"] if x["type"] == 2][0])
-        
-        if currentValue < 600 and playerName in telegram_users:
-            telegramName = telegram_users[playerName]
+        if currentValue < 600:
+            telegramName = telegram_users.get(playerName, "???")
             players_to_notify.append(f"{playerName} ({currentValue} / 600) {telegramName}")
 
     return players_to_notify

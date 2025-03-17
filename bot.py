@@ -66,12 +66,18 @@ def main():
     data = response.json()["guild"]["member"]
 
     players_to_notify = get_players_to_notify(data, telegram_users)
+    
     if players_to_notify:
         message = "Кто тянет команду вниз?\nКто положил меньше всех денег в банк?\nКто не ответил ни на один вопрос?\nКто самое слабое звено?\n\n" + "\n".join(players_to_notify)
     else:
-        message = "Нихуя себе дождались.\nВсе энку сдали...\n"
+        dont_send_full_distribution = os.getenv("DONT_SEND_FULL_DISTRIBUTION", "false").lower()
+        if dont_send_full_distribution != "true":
+            message = "Нихуя себе дождались.\nВсе энку сдали...\n"
+        else:
+            message = None
 
-    send_telegram_message(chat_id, message, thread_id)
+    if message:
+        send_telegram_message(chat_id, message, thread_id)
 
 if __name__ == "__main__":
     main()
